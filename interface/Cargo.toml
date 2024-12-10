@@ -3,8 +3,13 @@ name = "interface"
 version = "0.1.0"
 edition = "2021"
 
-[lib]
-name = "interface"
-path = "src/lib.rs"
-
 [dependencies]
+axum = { workspace = true }
+axum-macros = { workspace = true }
+sea-orm = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+
+infra = { path = "../infra" }
+service = { path = "../service" }
