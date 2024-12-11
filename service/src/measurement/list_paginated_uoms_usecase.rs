@@ -57,7 +57,7 @@ impl ListPaginatedUomsUsecase {
       PaginationMeta {
         total,
         total_pages,
-        page,
+        page: page + 1,
         per_page,
       },
     ))

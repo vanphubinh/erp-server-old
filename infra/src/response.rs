@@ -62,3 +62,18 @@ where
     Json(self).into_response()
   }
 }
+
+#[derive(Serialize)]
+pub struct UpdateResponse<T> {
+  pub ok: bool,
+  pub data: T,
+}
+
+impl<T> IntoResponse for UpdateResponse<T>
+where
+  T: Serialize,
+{
+  fn into_response(self) -> Response {
+    Json(self).into_response()
+  }
+}

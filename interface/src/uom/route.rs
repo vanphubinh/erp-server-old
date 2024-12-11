@@ -6,7 +6,7 @@ use axum::{
 };
 use infra::state::AppState;
 
-use super::handler::{create_uom, find_uom, list_paginated_uoms};
+use super::handler::{create_uom, find_uom, list_paginated_uoms, update_uom};
 pub struct UomRouter {}
 
 impl UomRouter {
@@ -15,5 +15,6 @@ impl UomRouter {
       .route("/uoms.list", get(list_paginated_uoms))
       .route("/uoms.create", post(create_uom))
       .route("/uoms.find/:id", get(find_uom))
+      .route("/uoms.update", post(update_uom))
   }
 }

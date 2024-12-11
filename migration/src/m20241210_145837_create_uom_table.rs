@@ -13,8 +13,6 @@ impl MigrationTrait for Migration {
           .if_not_exists()
           .col(uuid(Uom::Id).primary_key())
           .col(text(Uom::Name))
-          .col(timestamp_with_time_zone(Uom::CreatedAt))
-          .col(timestamp_with_time_zone(Uom::UpdatedAt))
           .to_owned(),
       )
       .await
@@ -32,6 +30,4 @@ enum Uom {
   Table,
   Id,
   Name,
-  CreatedAt,
-  UpdatedAt,
 }
