@@ -2,7 +2,6 @@ use axum::{
   http::{header::CONTENT_TYPE, Method},
   Router,
 };
-use discern::{command::CommandBus, command_bus, query::QueryBus, query_bus};
 use infra::state::AppState;
 use interface::uom::route::UomRouter;
 use sea_orm::{Database, DatabaseConnection, DbErr};
@@ -44,12 +43,7 @@ pub async fn start() {
       return;
     }
   };
-  let app_state = Arc::new(AppState {
-    write_db,
-    read_db,
-    query_bus: init_query_bus(),
-    command_bus: init_command_bus(),
-  });
+  let app_state = Arc::new(AppState { write_db, read_db });
 
   let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
   let tcp = TcpListener::bind(&addr).await.unwrap();
@@ -81,12 +75,4 @@ async fn get_db_connection(env_var: &str) -> Result<DatabaseConnection, DbErr> {
   let db_url = std::env::var(env_var).unwrap();
   let db = Database::connect(&db_url).await?;
   Ok(db)
-}
-
-fn init_query_bus() -> QueryBus {
-  query_bus! {}
-}
-
-fn init_command_bus() -> CommandBus {
-  command_bus! {}
 }

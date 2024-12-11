@@ -7,11 +7,9 @@ edition = "2021"
 members = ["domain", "infra", "interface", "server", "service", "migration"]
 
 [workspace.dependencies]
-async-trait = "0.1.81"
 axum = "0.7.9"
 axum-macros = "0.4.2"
 chrono = "0.4.38"
-discern = "0.1.0"
 dotenvy = "0.15.7"
 sea-orm = { version = "1.1.2", features = [
   "sqlx-postgres",

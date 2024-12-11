@@ -11,5 +11,6 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 thiserror = { workspace = true }
 
+domain = { path = "../domain" }
 infra = { path = "../infra" }
 service = { path = "../service" }

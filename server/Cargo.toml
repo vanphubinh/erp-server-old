@@ -5,7 +5,6 @@ edition = "2021"
 
 [dependencies]
 axum = { workspace = true }
-discern = { workspace = true }
 dotenvy = { workspace = true }
 sea-orm = { workspace = true }
 tokio = { workspace = true }

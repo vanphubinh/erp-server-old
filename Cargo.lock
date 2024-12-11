@@ -816,15 +816,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "discern"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f3d547a69c991a67f23ba0b2b4419b8e6c53ea06a0f035ff6df396e52d2c0d85"
-dependencies = [
- "async-trait",
-]
-
-[[package]]
 name = "displaydoc"
 version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1477,10 +1468,8 @@ dependencies = [
 name = "infra"
 version = "0.1.0"
 dependencies = [
- "async-trait",
  "axum",
  "chrono",
- "discern",
  "sea-orm",
  "serde",
  "serde_json",
@@ -1505,6 +1494,7 @@ version = "0.1.0"
 dependencies = [
  "axum",
  "axum-macros",
+ "domain",
  "infra",
  "sea-orm",
  "serde",
@@ -2583,7 +2573,6 @@ name = "server"
 version = "0.1.0"
 dependencies = [
  "axum",
- "discern",
  "dotenvy",
  "infra",
  "interface",
@@ -2599,7 +2588,6 @@ name = "service"
 version = "0.1.0"
 dependencies = [
  "axum",
- "discern",
  "domain",
  "infra",
  "sea-orm",
