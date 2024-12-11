@@ -1,6 +1,7 @@
 use async_trait::async_trait;
+use chrono::Utc;
 use infra::uuid::Uuid;
-use sea_orm::{entity::prelude::*, ActiveModelTrait, Set};
+use sea_orm::{entity::prelude::*, ActiveModelTrait, FromQueryResult, Set};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
@@ -11,6 +12,8 @@ pub struct Model {
   pub id: Uuid,
   #[sea_orm(column_type = "Text")]
   pub name: String,
+  pub created_at: DateTimeWithTimeZone,
+  pub updated_at: DateTimeWithTimeZone,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
@@ -24,4 +27,27 @@ impl ActiveModelBehavior for ActiveModel {
       ..ActiveModelTrait::default()
     }
   }
+
+  async fn before_save<C>(self, db: &C, insert: bool) -> Result<Self, DbErr>
+  where
+    C: ConnectionTrait,
+  {
+    let _ = db;
+    let mut this = self;
+    if insert {
+      let now = Utc::now().into();
+      this.created_at = Set(now);
+      this.updated_at = Set(now);
+    } else {
+      this.updated_at = Set(Utc::now().into());
+    }
+    Ok(this)
+  }
+}
+#[derive(Debug, DerivePartialModel, Serialize, FromQueryResult)]
+#[sea_orm(entity = "Entity")]
+#[serde(rename_all = "camelCase")]
+pub struct PartialModel {
+  pub id: Uuid,
+  pub name: String,
 }

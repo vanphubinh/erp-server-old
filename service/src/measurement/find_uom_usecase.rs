@@ -2,9 +2,9 @@ use axum::{
   http::StatusCode,
   response::{IntoResponse, Response},
 };
-use domain::measurement::uom::{self, Column, Entity as Uom};
+use domain::measurement::uom::{self, Entity as Uom};
 use infra::{util::error, uuid::Uuid};
-use sea_orm::{ConnectionTrait, DbErr, EntityTrait, QuerySelect};
+use sea_orm::{ConnectionTrait, DbErr, EntityTrait};
 use serde::Deserialize;
 use thiserror::Error;
 
@@ -36,11 +36,9 @@ impl IntoResponse for FindUomError {
 }
 
 impl FindUomUsecase {
-  pub async fn invoke(&self, db: impl ConnectionTrait) -> Result<uom::Model, FindUomError> {
+  pub async fn invoke(&self, db: impl ConnectionTrait) -> Result<uom::PartialModel, FindUomError> {
     let uom = Uom::find_by_id(self.id)
-      .select_only()
-      .column(Column::Id)
-      .column(Column::Name)
+      .into_partial_model::<uom::PartialModel>()
       .one(&db)
       .await?;
 

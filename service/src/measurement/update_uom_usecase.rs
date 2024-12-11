@@ -35,13 +35,21 @@ impl IntoResponse for UpdateUomError {
 }
 
 impl UpdateUomUsecase {
-  pub async fn invoke(&self, db: impl ConnectionTrait) -> Result<uom::Model, UpdateUomError> {
+  pub async fn invoke(
+    &self,
+    db: impl ConnectionTrait,
+  ) -> Result<uom::PartialModel, UpdateUomError> {
     let uom = Uom {
       id: Set(self.id),
       name: Set(self.name.to_string()),
+      ..Default::default()
     };
     let updated_uom = uom.update(&db).await?;
+    let partial_uom = uom::PartialModel {
+      id: updated_uom.id,
+      name: updated_uom.name,
+    };
 
-    Ok(updated_uom)
+    Ok(partial_uom)
   }
 }

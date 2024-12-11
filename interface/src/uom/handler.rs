@@ -3,7 +3,7 @@ use axum::{
   http::StatusCode,
 };
 use axum_macros::debug_handler;
-use domain::measurement::uom::Model as Uom;
+use domain::measurement::uom::PartialModel as Uom;
 use infra::{
   response::{CreateResponse, FindOneResponse, PaginatedResponse, UpdateResponse},
   state::AppState,

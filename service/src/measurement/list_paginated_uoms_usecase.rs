@@ -2,9 +2,9 @@ use axum::{
   http::StatusCode,
   response::{IntoResponse, Response},
 };
-use domain::measurement::uom::{self, Column, Entity as Uom};
+use domain::measurement::uom::{self, Entity as Uom};
 use infra::{response::PaginationMeta, util::error};
-use sea_orm::{ConnectionTrait, DbErr, EntityTrait, PaginatorTrait, QuerySelect};
+use sea_orm::{ConnectionTrait, DbErr, EntityTrait, PaginatorTrait};
 use serde::Deserialize;
 use thiserror::Error;
 
@@ -38,14 +38,12 @@ impl ListPaginatedUomsUsecase {
   pub async fn invoke(
     &self,
     db: impl ConnectionTrait,
-  ) -> Result<(Vec<uom::Model>, PaginationMeta), ListPaginatedUomsError> {
+  ) -> Result<(Vec<uom::PartialModel>, PaginationMeta), ListPaginatedUomsError> {
     let per_page = self.per_page.unwrap_or(30);
     let page = self.page.unwrap_or(1) - 1;
 
     let uom_pages = Uom::find()
-      .select_only()
-      .column(Column::Id)
-      .column(Column::Name)
+      .into_partial_model::<uom::PartialModel>()
       .paginate(&db, per_page);
     let uoms = uom_pages.fetch_page(page).await?;
     let items_and_pages = uom_pages.num_items_and_pages().await?;

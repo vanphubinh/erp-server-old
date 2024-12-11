@@ -34,13 +34,20 @@ impl IntoResponse for CreateUomError {
 }
 
 impl CreateUomUsecase {
-  pub async fn invoke(&self, db: impl ConnectionTrait) -> Result<uom::Model, CreateUomError> {
+  pub async fn invoke(
+    &self,
+    db: impl ConnectionTrait,
+  ) -> Result<uom::PartialModel, CreateUomError> {
     let uom = Uom {
       name: Set(self.name.to_owned()),
       ..Default::default()
     };
     let uom = uom.insert(&db).await?;
+    let partial_uom = uom::PartialModel {
+      id: uom.id,
+      name: uom.name,
+    };
 
-    Ok(uom)
+    Ok(partial_uom)
   }
 }
