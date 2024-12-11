@@ -4,10 +4,13 @@ use axum::{
 };
 use axum_macros::debug_handler;
 use domain::measurement::uom::Model as Uom;
-use infra::{response::PaginatedResponse, state::AppState};
+use infra::{
+  response::{CreateResponse, FindOneResponse, PaginatedResponse},
+  state::AppState,
+};
 use service::measurement::{
-  CreateUomError, CreateUomParams, CreateUomUsecase, ListPaginatedUomsError,
-  ListPaginatedUomsParams, ListPaginatedUomsUsecase,
+  CreateUomError, CreateUomParams, CreateUomUsecase, FindUomError, FindUomParams, FindUomUsecase,
+  ListPaginatedUomsError, ListPaginatedUomsParams, ListPaginatedUomsUsecase,
 };
 use std::sync::Arc;
 
@@ -34,10 +37,31 @@ pub async fn list_paginated_uoms(
 pub async fn create_uom(
   State(state): State<Arc<AppState>>,
   Json(body): Json<CreateUomParams>,
-) -> Result<(StatusCode, Json<Uom>), CreateUomError> {
+) -> Result<(StatusCode, CreateResponse), CreateUomError> {
   let usecase = CreateUomUsecase { name: body.name };
 
   let uom = usecase.invoke(state.read_db.clone()).await?;
 
-  Ok((StatusCode::CREATED, Json(uom)))
+  Ok((
+    StatusCode::CREATED,
+    CreateResponse {
+      id: uom.id,
+      ok: true,
+    },
+  ))
+}
+
+#[debug_handler]
+pub async fn find_uom(
+  State(state): State<Arc<AppState>>,
+  Query(query): Query<FindUomParams>,
+) -> Result<FindOneResponse<Uom>, FindUomError> {
+  let usecase = FindUomUsecase { id: query.id };
+
+  let uom = usecase.invoke(state.read_db.clone()).await?;
+
+  Ok(FindOneResponse::<Uom> {
+    ok: true,
+    data: uom,
+  })
 }
