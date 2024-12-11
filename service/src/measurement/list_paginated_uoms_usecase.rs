@@ -2,19 +2,19 @@ use axum::{
   http::StatusCode,
   response::{IntoResponse, Response},
 };
-use domain::measurement::uom::{Column, Entity as Uom, Model as UomModel};
+use domain::measurement::uom::{self, Column, Entity as Uom};
 use infra::{response::PaginationMeta, util::error};
 use sea_orm::{ConnectionTrait, DbErr, EntityTrait, PaginatorTrait, QuerySelect};
 use serde::Deserialize;
 use thiserror::Error;
 
 #[derive(Debug, Deserialize)]
-pub struct ListPaginatedUomsUseCase {
+pub struct ListPaginatedUomsUsecase {
   pub page: Option<u64>,
   pub per_page: Option<u64>,
 }
 
-pub type ListPaginatedUomsParams = ListPaginatedUomsUseCase;
+pub type ListPaginatedUomsParams = ListPaginatedUomsUsecase;
 
 #[derive(Error, Debug)]
 pub enum ListPaginatedUomsError {
@@ -30,19 +30,15 @@ impl IntoResponse for ListPaginatedUomsError {
       }
     };
 
-    (
-      status,
-      error(code, Some("list_paginated_uoms_query".to_string())),
-    )
-      .into_response()
+    (status, error(code, Some("list_paginated_uoms".to_string()))).into_response()
   }
 }
 
-impl ListPaginatedUomsUseCase {
+impl ListPaginatedUomsUsecase {
   pub async fn invoke(
     &self,
     db: impl ConnectionTrait,
-  ) -> Result<(Vec<UomModel>, PaginationMeta), ListPaginatedUomsError> {
+  ) -> Result<(Vec<uom::Model>, PaginationMeta), ListPaginatedUomsError> {
     let per_page = self.per_page.unwrap_or(30);
     let page = self.page.unwrap_or(1) - 1;
 
