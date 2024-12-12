@@ -12,17 +12,17 @@ use serde::Deserialize;
 use thiserror::Error;
 
 #[derive(Debug, Deserialize, Clone)]
-#[serde(rename_all(deserialize = "snake_case"))]
 pub struct CreateAttributeUsecase {
   pub name: String,
+  #[serde(rename(deserialize = "attributeOptions"))]
   pub attribute_options: Vec<AttributeOption>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
-#[serde(rename_all(deserialize = "snake_case"))]
 pub struct AttributeOption {
   pub value: String,
 }
+
 pub type CreateAttributePayload = CreateAttributeUsecase;
 
 #[derive(Error, Debug)]

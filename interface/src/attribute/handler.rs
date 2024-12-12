@@ -11,8 +11,8 @@ use infra::{
   uuid::Uuid,
 };
 use service::product::{
-  CreateAttributeError, CreateAttributePayload, ListPaginatedAttributesError,
-  ListPaginatedAttributesParams, ListPaginatedAttributesUsecase,
+  CreateAttributeError, CreateAttributePayload, CreateAttributeUsecase,
+  ListPaginatedAttributesError, ListPaginatedAttributesParams, ListPaginatedAttributesUsecase,
 };
 use std::{collections::HashMap, sync::Arc};
 
@@ -21,7 +21,7 @@ pub async fn create_attribute(
   State(state): State<Arc<AppState>>,
   Json(payload): Json<CreateAttributePayload>,
 ) -> Result<(StatusCode, CreateResponse), CreateAttributeError> {
-  let usecase = CreateAttributePayload {
+  let usecase = CreateAttributeUsecase {
     name: payload.name,
     attribute_options: payload.attribute_options,
   };
