@@ -1,2 +1,2 @@
-pub mod catalog;
 pub mod measurement;
+pub mod product;

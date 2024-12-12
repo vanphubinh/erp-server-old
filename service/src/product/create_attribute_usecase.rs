@@ -2,7 +2,7 @@ use axum::{
   http::StatusCode,
   response::{IntoResponse, Response},
 };
-use domain::catalog::{
+use domain::product::{
   attribute::{self, ActiveModel as Attribute},
   attribute_option,
 };

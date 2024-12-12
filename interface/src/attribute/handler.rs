@@ -1,7 +1,7 @@
 use axum::{extract::State, http::StatusCode, Json};
 use axum_macros::debug_handler;
-use infra::{response::CreateResponse, state::AppState, uuid::Uuid};
-use service::catalog::{CreateAttributeError, CreateAttributePayload};
+use infra::{response::CreateResponse, state::AppState};
+use service::product::{CreateAttributeError, CreateAttributePayload};
 use std::sync::Arc;
 
 #[debug_handler]

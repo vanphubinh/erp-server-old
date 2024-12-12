@@ -2,7 +2,7 @@ use axum::{
   http::StatusCode,
   response::{IntoResponse, Response},
 };
-use domain::catalog::category::{self, Entity as Category};
+use domain::product::category::{self, Entity as Category};
 use infra::{response::PaginationMeta, util::error};
 use sea_orm::{ConnectionTrait, DbErr, EntityTrait, PaginatorTrait};
 use serde::Deserialize;

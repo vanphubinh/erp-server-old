@@ -1,8 +1,8 @@
 use axum::extract::{Query, State};
 use axum_macros::debug_handler;
-use domain::catalog::category::PartialModel as Category;
+use domain::product::category::PartialModel as Category;
 use infra::{response::PaginatedResponse, state::AppState};
-use service::catalog::{
+use service::product::{
   ListPaginatedCategoriesError, ListPaginatedCategoriesParams, ListPaginatedCategoriesUsecase,
 };
 use std::sync::Arc;
