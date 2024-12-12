@@ -58,16 +58,16 @@ impl CreateAttributeUsecase {
             ..Default::default()
           };
           let attribute = attribute.insert(txn).await?;
-          let mut options: Vec<attribute_option::ActiveModel> = Vec::new();
-          for (_, option) in attribute_options.into_iter().enumerate() {
-            let attribute_option = attribute_option::ActiveModel {
+          let options = attribute_options
+            .into_iter()
+            .map(|option| attribute_option::ActiveModel {
               value: Set(option.value.to_string()),
               attribute_id: Set(attribute.id),
               ..Default::default()
-            };
-            options.push(attribute_option);
-          }
-          if !options.is_empty() {
+            })
+            .collect::<Vec<_>>();
+
+          if options.len() > 0 {
             attribute_option::Entity::insert_many(options)
               .exec(txn)
               .await?;

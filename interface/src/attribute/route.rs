@@ -6,7 +6,9 @@ use axum::{
 };
 use infra::state::AppState;
 
-use super::handler::{create_attribute, list_paginated_attributes};
+use super::handler::{
+  create_attribute, find_attribute, list_paginated_attributes, update_attribute,
+};
 pub struct AttributeRouter {}
 
 impl AttributeRouter {
@@ -14,5 +16,7 @@ impl AttributeRouter {
     Router::new()
       .route("/attributes.create", post(create_attribute))
       .route("/attributes.list", get(list_paginated_attributes))
+      .route("/attributes.find/:id", get(find_attribute))
+      .route("/attributes.update", post(update_attribute))
   }
 }

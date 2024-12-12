@@ -1,18 +1,23 @@
 use axum::{
-  extract::{Query, State},
+  extract::{Path, Query, State},
   http::StatusCode,
   Json,
 };
 use axum_macros::debug_handler;
-use domain::product::{attribute::AttributeDTO, attribute_option};
+use domain::product::{
+  attribute::{self, AttributeDTO},
+  attribute_option,
+};
 use infra::{
   response::{CreateResponse, PaginatedResponse},
   state::AppState,
   uuid::Uuid,
 };
 use service::product::{
-  CreateAttributeError, CreateAttributePayload, CreateAttributeUsecase,
-  ListPaginatedAttributesError, ListPaginatedAttributesParams, ListPaginatedAttributesUsecase,
+  update_attribute_usecase::{UpdateAttributeError, UpdateAttributeUsecase},
+  CreateAttributeError, CreateAttributePayload, CreateAttributeUsecase, FindAttributeError,
+  FindAttributeUsecase, ListPaginatedAttributesError, ListPaginatedAttributesParams,
+  ListPaginatedAttributesUsecase, UpdateAttributePayload,
 };
 use std::{collections::HashMap, sync::Arc};
 
@@ -47,7 +52,7 @@ pub async fn list_paginated_attributes(
     per_page: query.per_page,
   };
 
-  let (attributes, pagination_meta) = usecase.invoke(state.write_db.clone()).await?;
+  let (attributes, pagination_meta) = usecase.invoke(state.read_db.clone()).await?;
 
   let mut attribute_map: HashMap<Uuid, AttributeDTO> = HashMap::new();
 
@@ -78,4 +83,28 @@ pub async fn list_paginated_attributes(
     meta: pagination_meta,
     ok: true,
   }))
+}
+
+#[debug_handler]
+pub async fn find_attribute(
+  State(state): State<Arc<AppState>>,
+  Path(id): Path<Uuid>,
+) -> Result<Json<AttributeDTO>, FindAttributeError> {
+  let usecase = FindAttributeUsecase { id };
+  let attribute = usecase.invoke(state.read_db.clone()).await?;
+  Ok(Json(attribute))
+}
+
+#[debug_handler]
+pub async fn update_attribute(
+  State(state): State<Arc<AppState>>,
+  Json(payload): Json<UpdateAttributePayload>,
+) -> Result<Json<attribute::Model>, UpdateAttributeError> {
+  let usecase = UpdateAttributeUsecase {
+    id: payload.id,
+    name: payload.name,
+    attribute_options: payload.attribute_options,
+  };
+  let attribute = usecase.invoke(state.read_db.clone()).await?;
+  Ok(Json(attribute))
 }
