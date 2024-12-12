@@ -65,8 +65,9 @@ pub struct QueryResult {
 }
 
 #[derive(Debug, Serialize)]
+#[serde(rename_all(serialize = "camelCase"))]
 pub struct AttributeDTO {
   pub id: Uuid,
   pub name: String,
-  pub options: Vec<super::attribute_option::PartialModel>,
+  pub attribute_options: Vec<super::attribute_option::PartialModel>,
 }
