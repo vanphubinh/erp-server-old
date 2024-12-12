@@ -3,7 +3,7 @@ use axum::{
   Router,
 };
 use infra::state::AppState;
-use interface::uom::route::UomRouter;
+use interface::{category::route::CategoryRouter, uom::route::UomRouter};
 use sea_orm::{Database, DatabaseConnection, DbErr};
 use std::{net::SocketAddr, sync::Arc};
 use tokio::net::TcpListener;
@@ -61,6 +61,7 @@ pub async fn start() {
 
   let router = Router::new()
     .merge(UomRouter::new())
+    .merge(CategoryRouter::new())
     .layer(cors)
     .layer(
       TraceLayer::new_for_http().make_span_with(trace::DefaultMakeSpan::new().level(Level::INFO)),
