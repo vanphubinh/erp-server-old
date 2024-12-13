@@ -4,12 +4,9 @@ use axum::{
   Json,
 };
 use axum_macros::debug_handler;
-use domain::product::{
-  attribute::{self, AttributeDTO},
-  attribute_option,
-};
+use domain::product::{attribute::AttributeDTO, attribute_option};
 use infra::{
-  response::{CreateResponse, PaginatedResponse},
+  response::{CreateResponse, FindOneResponse, OkResponse, PaginatedResponse},
   state::AppState,
   uuid::Uuid,
 };
@@ -89,22 +86,25 @@ pub async fn list_paginated_attributes(
 pub async fn find_attribute(
   State(state): State<Arc<AppState>>,
   Path(id): Path<Uuid>,
-) -> Result<Json<AttributeDTO>, FindAttributeError> {
+) -> Result<FindOneResponse<AttributeDTO>, FindAttributeError> {
   let usecase = FindAttributeUsecase { id };
   let attribute = usecase.invoke(state.read_db.clone()).await?;
-  Ok(Json(attribute))
+  Ok(FindOneResponse::<AttributeDTO> {
+    ok: true,
+    data: attribute,
+  })
 }
 
 #[debug_handler]
 pub async fn update_attribute(
   State(state): State<Arc<AppState>>,
   Json(payload): Json<UpdateAttributePayload>,
-) -> Result<Json<attribute::Model>, UpdateAttributeError> {
+) -> Result<OkResponse, UpdateAttributeError> {
   let usecase = UpdateAttributeUsecase {
     id: payload.id,
     name: payload.name,
     attribute_options: payload.attribute_options,
   };
-  let attribute = usecase.invoke(state.read_db.clone()).await?;
-  Ok(Json(attribute))
+  usecase.invoke(state.read_db.clone()).await?;
+  Ok(OkResponse { ok: true })
 }

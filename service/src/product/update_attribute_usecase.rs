@@ -78,6 +78,7 @@ impl UpdateAttributeUsecase {
               });
 
           attribute_option::Entity::insert_many(options)
+            .on_empty_do_nothing()
             .on_conflict(
               OnConflict::columns([attribute_option::Column::Id])
                 .update_column(attribute_option::Column::Value)

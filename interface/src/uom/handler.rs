@@ -5,7 +5,7 @@ use axum::{
 use axum_macros::debug_handler;
 use domain::measurement::uom::PartialModel as Uom;
 use infra::{
-  response::{CreateResponse, FindOneResponse, PaginatedResponse, UpdateResponse},
+  response::{CreateResponse, FindOneResponse, OkResponse, PaginatedResponse},
   state::AppState,
 };
 use service::measurement::{
@@ -71,19 +71,13 @@ pub async fn find_uom(
 pub async fn update_uom(
   State(state): State<Arc<AppState>>,
   Json(body): Json<UpdateUomParams>,
-) -> Result<(StatusCode, UpdateResponse<Uom>), UpdateUomError> {
+) -> Result<OkResponse, UpdateUomError> {
   let usecase = UpdateUomUsecase {
     id: body.id,
     name: body.name,
   };
 
-  let uom = usecase.invoke(state.read_db.clone()).await?;
+  usecase.invoke(state.read_db.clone()).await?;
 
-  Ok((
-    StatusCode::OK,
-    UpdateResponse::<Uom> {
-      data: uom,
-      ok: true,
-    },
-  ))
+  Ok(OkResponse { ok: true })
 }

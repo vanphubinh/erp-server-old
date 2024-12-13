@@ -64,15 +64,11 @@ where
 }
 
 #[derive(Serialize)]
-pub struct UpdateResponse<T> {
+pub struct OkResponse {
   pub ok: bool,
-  pub data: T,
 }
 
-impl<T> IntoResponse for UpdateResponse<T>
-where
-  T: Serialize,
-{
+impl IntoResponse for OkResponse {
   fn into_response(self) -> Response {
     Json(self).into_response()
   }
