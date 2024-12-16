@@ -5,7 +5,7 @@ use sea_orm::{entity::prelude::*, FromQueryResult, Set};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
-#[sea_orm(table_name = "uom")]
+#[sea_orm(table_name = "product_template")]
 #[serde(rename_all = "camelCase")]
 pub struct Model {
   #[sea_orm(primary_key, auto_increment = false)]
