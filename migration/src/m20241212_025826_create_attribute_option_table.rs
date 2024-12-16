@@ -12,7 +12,7 @@ impl MigrationTrait for Migration {
           .table(AttributeOption::Table)
           .if_not_exists()
           .col(uuid(AttributeOption::Id).primary_key())
-          .col(text(AttributeOption::Value))
+          .col(text(AttributeOption::Value).default(""))
           .col(uuid(AttributeOption::AttributeId))
           .foreign_key(
             ForeignKey::create()

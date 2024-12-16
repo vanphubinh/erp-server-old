@@ -12,7 +12,7 @@ impl MigrationTrait for Migration {
           .table(Category::Table)
           .if_not_exists()
           .col(uuid(Category::Id).primary_key())
-          .col(text(Category::Name))
+          .col(text(Category::Name).default(""))
           .col(uuid_null(Category::ParentCategoryId))
           .col(timestamp_with_time_zone(Category::CreatedAt).default(Expr::current_timestamp()))
           .col(timestamp_with_time_zone_null(Category::UpdatedAt))
