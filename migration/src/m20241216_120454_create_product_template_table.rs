@@ -11,7 +11,7 @@ impl MigrationTrait for Migration {
         Table::create()
           .table(ProductTemplate::Table)
           .if_not_exists()
-          .col(pk_auto(ProductTemplate::Id))
+          .col(uuid(ProductTemplate::Id).primary_key())
           .col(text(ProductTemplate::Name).default(""))
           .col(text(ProductTemplate::Description).default(""))
           .col(uuid(ProductTemplate::UomId))
