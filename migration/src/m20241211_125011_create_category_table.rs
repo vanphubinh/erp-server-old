@@ -14,8 +14,8 @@ impl MigrationTrait for Migration {
           .col(uuid(Category::Id).primary_key())
           .col(text(Category::Name))
           .col(uuid_null(Category::ParentCategoryId))
-          .col(timestamp_with_time_zone(Category::CreatedAt))
-          .col(timestamp_with_time_zone(Category::UpdatedAt))
+          .col(timestamp_with_time_zone(Category::CreatedAt).default(Expr::current_timestamp()))
+          .col(timestamp_with_time_zone_null(Category::UpdatedAt))
           .foreign_key(
             ForeignKey::create()
               .name("fk-category-parent_category_id")

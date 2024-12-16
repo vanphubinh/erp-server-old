@@ -13,8 +13,8 @@ impl MigrationTrait for Migration {
           .if_not_exists()
           .col(uuid(Attribute::Id).primary_key())
           .col(text(Attribute::Name))
-          .col(timestamp_with_time_zone(Attribute::CreatedAt))
-          .col(timestamp_with_time_zone(Attribute::UpdatedAt))
+          .col(timestamp_with_time_zone(Attribute::CreatedAt).default(Expr::current_timestamp()))
+          .col(timestamp_with_time_zone_null(Attribute::UpdatedAt))
           .to_owned(),
       )
       .await

@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use chrono::Utc;
 use infra::uuid::Uuid;
-use sea_orm::{entity::prelude::*, ActiveModelTrait, FromQueryResult, Set};
+use sea_orm::{entity::prelude::*, FromQueryResult, Set};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
@@ -12,8 +12,9 @@ pub struct Model {
   pub id: Uuid,
   #[sea_orm(column_type = "Text")]
   pub name: String,
-  pub created_at: DateTimeWithTimeZone,
-  pub updated_at: DateTimeWithTimeZone,
+  pub created_at: ChronoDateTimeWithTimeZone,
+  #[sea_orm(nullable)]
+  pub updated_at: Option<ChronoDateTimeWithTimeZone>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
@@ -34,12 +35,8 @@ impl ActiveModelBehavior for ActiveModel {
   {
     let _ = db;
     let mut this = self;
-    if insert {
-      let now = Utc::now().into();
-      this.created_at = Set(now);
-      this.updated_at = Set(now);
-    } else {
-      this.updated_at = Set(Utc::now().into());
+    if !insert {
+      this.updated_at = Set(Some(Utc::now().into()));
     }
     Ok(this)
   }
