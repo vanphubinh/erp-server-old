@@ -7,6 +7,7 @@ mod m20241211_125011_create_category_table;
 mod m20241212_025514_create_attribute_table;
 mod m20241212_025826_create_attribute_option_table;
 mod m20241216_120454_create_product_template_table;
+mod m20241216_143112_create_product_table;
 
 #[async_trait::async_trait]
 impl MigratorTrait for Migrator {
@@ -17,6 +18,7 @@ impl MigratorTrait for Migrator {
       Box::new(m20241212_025514_create_attribute_table::Migration),
       Box::new(m20241212_025826_create_attribute_option_table::Migration),
       Box::new(m20241216_120454_create_product_template_table::Migration),
+      Box::new(m20241216_143112_create_product_table::Migration),
     ]
   }
 }
