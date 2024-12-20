@@ -15,3 +15,6 @@ pub use create_attribute_usecase::*;
 
 pub mod create_product_usecase;
 pub use create_product_usecase::*;
+
+pub mod find_options_by_attribute_id;
+pub use find_options_by_attribute_id::*;

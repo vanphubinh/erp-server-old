@@ -73,3 +73,19 @@ impl IntoResponse for OkResponse {
     Json(self).into_response()
   }
 }
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct QueryResponse<T> {
+  pub ok: bool,
+  pub data: T,
+}
+
+impl<T> IntoResponse for QueryResponse<T>
+where
+  T: Serialize,
+{
+  fn into_response(self) -> Response {
+    Json(self).into_response()
+  }
+}

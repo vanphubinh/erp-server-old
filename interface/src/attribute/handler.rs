@@ -6,15 +6,16 @@ use axum::{
 use axum_macros::debug_handler;
 use domain::product::{attribute::AttributeDTO, attribute_option};
 use infra::{
-  response::{CreateResponse, FindOneResponse, OkResponse, PaginatedResponse},
+  response::{CreateResponse, FindOneResponse, OkResponse, PaginatedResponse, QueryResponse},
   state::AppState,
   uuid::Uuid,
 };
 use service::product::{
   update_attribute_usecase::{UpdateAttributeError, UpdateAttributeUsecase},
   CreateAttributeError, CreateAttributePayload, CreateAttributeUsecase, FindAttributeError,
-  FindAttributeUsecase, ListPaginatedAttributesError, ListPaginatedAttributesParams,
-  ListPaginatedAttributesUsecase, UpdateAttributePayload,
+  FindAttributeUsecase, FindOptionsByAttributeIdError, FindOptionsByAttributeIdUsecase,
+  ListPaginatedAttributesError, ListPaginatedAttributesParams, ListPaginatedAttributesUsecase,
+  UpdateAttributePayload,
 };
 use std::{collections::HashMap, sync::Arc};
 
@@ -107,4 +108,17 @@ pub async fn update_attribute(
   };
   usecase.invoke(state.read_db.clone()).await?;
   Ok(OkResponse { ok: true })
+}
+
+#[debug_handler]
+pub async fn find_options_by_attribute_id(
+  State(state): State<Arc<AppState>>,
+  Path(attribute_id): Path<Uuid>,
+) -> Result<QueryResponse<Vec<attribute_option::PartialModel>>, FindOptionsByAttributeIdError> {
+  let usecase = FindOptionsByAttributeIdUsecase { attribute_id };
+  let options = usecase.invoke(state.read_db.clone()).await?;
+  Ok(QueryResponse::<Vec<attribute_option::PartialModel>> {
+    ok: true,
+    data: options,
+  })
 }
