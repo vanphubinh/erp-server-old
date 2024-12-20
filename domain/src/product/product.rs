@@ -11,8 +11,8 @@ pub struct Model {
   #[sea_orm(primary_key, auto_increment = false)]
   pub id: Uuid,
   pub product_template_id: Uuid,
-  pub price: f64,
-  pub cost: f64,
+  pub price: Decimal,
+  pub cost: Decimal,
   pub created_at: ChronoDateTimeWithTimeZone,
   #[sea_orm(nullable)]
   pub updated_at: Option<ChronoDateTimeWithTimeZone>,

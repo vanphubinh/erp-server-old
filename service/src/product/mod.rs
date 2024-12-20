@@ -12,3 +12,6 @@ pub use update_attribute_usecase::UpdateAttributePayload;
 
 pub mod create_attribute_usecase;
 pub use create_attribute_usecase::*;
+
+pub mod create_product_usecase;
+pub use create_product_usecase::*;

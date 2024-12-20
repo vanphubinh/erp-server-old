@@ -50,6 +50,7 @@ impl MigrationTrait for Migration {
               .default(ProductSubtype::Normal.to_string()),
           )
           .col(text(ProductTemplate::Description).default(""))
+          .col(boolean(ProductTemplate::IsTrackInventory).default(true))
           .col(uuid(ProductTemplate::UomId))
           .col(uuid_null(ProductTemplate::CategoryId))
           .col(
@@ -94,6 +95,7 @@ enum ProductTemplate {
   Name,
   ProductType,
   ProductSubtype,
+  IsTrackInventory,
   Description,
   UomId,
   CategoryId,

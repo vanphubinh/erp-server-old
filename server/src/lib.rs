@@ -4,7 +4,8 @@ use axum::{
 };
 use infra::state::AppState;
 use interface::{
-  attribute::route::AttributeRouter, category::route::CategoryRouter, uom::route::UomRouter,
+  attribute::route::AttributeRouter, category::route::CategoryRouter,
+  product::route::ProductRouter, uom::route::UomRouter,
 };
 use sea_orm::{Database, DatabaseConnection, DbErr};
 use std::{net::SocketAddr, sync::Arc};
@@ -65,6 +66,7 @@ pub async fn start() {
     .merge(UomRouter::new())
     .merge(CategoryRouter::new())
     .merge(AttributeRouter::new())
+    .merge(ProductRouter::new())
     .layer(cors)
     .layer(
       TraceLayer::new_for_http().make_span_with(trace::DefaultMakeSpan::new().level(Level::INFO)),
