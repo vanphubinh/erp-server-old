@@ -53,12 +53,12 @@ impl ActiveModelBehavior for ActiveModel {
   }
 }
 
-#[derive(Debug, Serialize, FromQueryResult)]
-pub struct QueryResult {
+#[derive(Debug, DerivePartialModel, Serialize, FromQueryResult)]
+#[sea_orm(entity = "Entity")]
+#[serde(rename_all = "camelCase")]
+pub struct PartialModel {
   pub id: Uuid,
   pub name: String,
-  pub attribute_option_id: Option<Uuid>,
-  pub attribute_option_value: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
