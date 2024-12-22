@@ -1,9 +1,41 @@
 use std::sync::Arc;
 
-use axum::{extract::State, http::StatusCode, Json};
+use axum::{
+  extract::{Query, State},
+  http::StatusCode,
+  Json,
+};
 use axum_macros::debug_handler;
-use infra::{response::CreateResponse, state::AppState};
-use service::product::{CreateProductError, CreateProductPayload, CreateProductUsecase};
+use domain::product::product::QueryProductResult;
+use infra::{
+  response::{CreateResponse, PaginatedResponse},
+  state::AppState,
+};
+use service::product::{
+  list_paginated_products_usecase::{
+    ListPaginatedProductsError, ListPaginatedProductsParams, ListPaginatedProductsUsecase,
+  },
+  CreateProductError, CreateProductPayload, CreateProductUsecase,
+};
+
+#[debug_handler]
+pub async fn list_paginated_products(
+  State(state): State<Arc<AppState>>,
+  Query(query): Query<ListPaginatedProductsParams>,
+) -> Result<PaginatedResponse<QueryProductResult>, ListPaginatedProductsError> {
+  let usecase = ListPaginatedProductsUsecase {
+    page: Some(query.page.unwrap_or(1)),
+    per_page: Some(query.per_page.unwrap_or(30)),
+  };
+
+  let (products, meta) = usecase.invoke(state.read_db.clone()).await?;
+
+  Ok(PaginatedResponse::<QueryProductResult> {
+    ok: true,
+    data: products,
+    meta,
+  })
+}
 
 #[debug_handler]
 pub async fn create_product(

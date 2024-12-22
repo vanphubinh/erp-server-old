@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use chrono::Utc;
 use infra::uuid::Uuid;
-use sea_orm::{entity::prelude::*, Set};
+use sea_orm::{entity::prelude::*, FromQueryResult, Set};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize)]
@@ -19,7 +19,20 @@ pub struct Model {
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
-pub enum Relation {}
+pub enum Relation {
+  #[sea_orm(
+    belongs_to = "super::product_template::Entity",
+    from = "Column::ProductTemplateId",
+    to = "super::product_template::Column::Id"
+  )]
+  ProductTemplate,
+}
+
+impl Related<super::product_template::Entity> for Entity {
+  fn to() -> RelationDef {
+    Relation::ProductTemplate.def()
+  }
+}
 
 #[async_trait]
 impl ActiveModelBehavior for ActiveModel {
@@ -41,4 +54,12 @@ impl ActiveModelBehavior for ActiveModel {
     }
     Ok(this)
   }
+}
+
+#[derive(Debug, Serialize, FromQueryResult)]
+#[serde(rename_all = "camelCase")]
+pub struct QueryProductResult {
+  pub id: Uuid,
+  pub name: String,
+  pub product_template_id: Uuid,
 }

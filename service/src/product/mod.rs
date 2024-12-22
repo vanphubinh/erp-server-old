@@ -18,3 +18,6 @@ pub use create_product_usecase::*;
 
 pub mod find_options_by_attribute_id;
 pub use find_options_by_attribute_id::*;
+
+pub mod list_paginated_products_usecase;
+pub use list_paginated_products_usecase::*;
