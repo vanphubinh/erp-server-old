@@ -47,9 +47,14 @@ pub async fn start() {
     }
   };
   let app_state = Arc::new(AppState { write_db, read_db });
+  let port: u16 = std::env::var("PORT")
+    .unwrap_or("3000".into())
+    .parse()
+    .expect("failed to convert to number");
 
-  let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
-  let tcp = TcpListener::bind(&addr).await.unwrap();
+  let ipv6 = SocketAddr::from(([0, 0, 0, 0, 0, 0, 0, 0], port));
+
+  let ipv6_listener = TcpListener::bind(&ipv6).await.unwrap();
 
   let cors = CorsLayer::new()
     .allow_methods([
@@ -73,8 +78,8 @@ pub async fn start() {
     )
     .with_state(app_state.clone());
 
-  tracing::debug!("Listening on http://{}", addr);
-  axum::serve(tcp, router).await.unwrap();
+  tracing::debug!("Listening on http://{}", ipv6);
+  axum::serve(ipv6_listener, router).await.unwrap();
 }
 
 async fn get_db_connection(env_var: &str) -> Result<DatabaseConnection, DbErr> {
