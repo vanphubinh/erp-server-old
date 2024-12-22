@@ -15,6 +15,7 @@ impl MigrationTrait for Migration {
           .col(uuid(Product::ProductTemplateId))
           .col(decimal_len(Product::Price, 15, 3).default(0.0))
           .col(decimal_len(Product::Cost, 15, 3).default(0.0))
+          .col(boolean(Product::IsProductVariant).default(false))
           .col(timestamp_with_time_zone(Product::CreatedAt).default(Expr::current_timestamp()))
           .col(timestamp_with_time_zone_null(Product::UpdatedAt))
           .col(timestamp_with_time_zone_null(Product::ArchivedAt))
@@ -43,6 +44,7 @@ enum Product {
   ProductTemplateId,
   Price,
   Cost,
+  IsProductVariant,
   CreatedAt,
   UpdatedAt,
   ArchivedAt,

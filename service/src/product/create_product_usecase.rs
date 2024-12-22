@@ -2,10 +2,28 @@ use axum::{
   http::StatusCode,
   response::{IntoResponse, Response},
 };
-use domain::product::{product, product_template};
+use domain::product::{
+  attribute::{self},
+  attribute_option, product, product_combination, product_template,
+};
 use infra::{util::error, uuid::Uuid};
-use sea_orm::{prelude::Decimal, ActiveModelTrait, DbErr, Set, TransactionError, TransactionTrait};
+use sea_orm::{
+  prelude::Decimal, ActiveModelTrait, DbErr, EntityTrait, Set, TransactionError, TransactionTrait,
+};
 use serde::Deserialize;
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct VariantAttributeOption {
+  pub attribute: attribute::PartialModel,
+  pub option: attribute_option::PartialModel,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct Variant {
+  pub price: Decimal,
+  #[serde(rename(deserialize = "variantAttributeOptions"))]
+  pub attribute_options: Vec<VariantAttributeOption>,
+}
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct CreateProductUsecase {
@@ -26,6 +44,7 @@ pub struct CreateProductUsecase {
   pub create_corresponding_moulds: bool,
   #[serde(rename(deserialize = "isMultipleVariants"))]
   pub is_multiple_variants: bool,
+  pub variants: Vec<Variant>,
 }
 
 pub type CreateProductPayload = CreateProductUsecase;
@@ -52,11 +71,11 @@ impl CreateProductUsecase {
   pub async fn invoke(
     &self,
     db: impl TransactionTrait,
-  ) -> Result<product::Model, CreateProductError> {
+  ) -> Result<Vec<product::Model>, CreateProductError> {
     let payload = self.clone();
 
-    let product = db
-      .transaction::<_, product::Model, DbErr>(move |txn| {
+    let products = db
+      .transaction::<_, Vec<product::Model>, DbErr>(move |txn| {
         Box::pin(async move {
           let product_template = product_template::ActiveModel {
             name: Set(payload.name),
@@ -68,21 +87,55 @@ impl CreateProductUsecase {
             ..Default::default()
           };
           let product_template = product_template.insert(txn).await?;
+          let mut products = vec![];
 
-          let product = product::ActiveModel {
-            product_template_id: Set(product_template.id),
-            price: Set(payload.price),
-            cost: Set(payload.cost),
-            ..Default::default()
-          };
+          if payload.is_multiple_variants {
+            for variant in payload.variants.iter() {
+              let attribute_options = variant.attribute_options.iter().collect::<Vec<_>>();
+              let product = product::ActiveModel {
+                product_template_id: Set(product_template.id),
+                price: Set(variant.price),
+                cost: Set(payload.cost),
+                is_product_variant: Set(true),
+                ..Default::default()
+              };
+              let product = product.insert(txn).await?;
+              let mut product_combinations = vec![];
 
-          let product = product.insert(txn).await?;
+              for option in attribute_options.iter() {
+                let attribute_option = option.option.clone();
+                let product_combination = product_combination::ActiveModel {
+                  product_id: Set(product.id),
+                  attribute_option_id: Set(attribute_option.id),
+                };
+                product_combinations.push(product_combination);
+              }
 
-          Ok(product)
+              product_combination::Entity::insert_many(product_combinations)
+                .on_empty_do_nothing()
+                .exec(txn)
+                .await?;
+
+              products.push(product);
+            }
+          } else {
+            let product = product::ActiveModel {
+              product_template_id: Set(product_template.id),
+              price: Set(payload.price),
+              cost: Set(payload.cost),
+              is_product_variant: Set(false),
+              ..Default::default()
+            };
+
+            let product = product.insert(txn).await?;
+            products.push(product);
+          }
+
+          Ok(products)
         })
       })
       .await?;
 
-    Ok(product)
+    Ok(products)
   }
 }

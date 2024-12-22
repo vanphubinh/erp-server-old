@@ -36,6 +36,20 @@ impl Related<super::attribute::Entity> for Entity {
   }
 }
 
+impl Related<super::product::Entity> for Entity {
+  fn to() -> RelationDef {
+    super::product_combination::Relation::Product.def()
+  }
+
+  fn via() -> Option<RelationDef> {
+    Some(
+      super::product_combination::Relation::AttributeOption
+        .def()
+        .rev(),
+    )
+  }
+}
+
 #[async_trait]
 impl ActiveModelBehavior for ActiveModel {
   fn new() -> Self {
@@ -46,7 +60,7 @@ impl ActiveModelBehavior for ActiveModel {
   }
 }
 
-#[derive(Debug, DerivePartialModel, Serialize, FromQueryResult)]
+#[derive(Debug, DerivePartialModel, Clone, Serialize, FromQueryResult, Deserialize)]
 #[sea_orm(entity = "Entity")]
 #[serde(rename_all = "camelCase")]
 pub struct PartialModel {

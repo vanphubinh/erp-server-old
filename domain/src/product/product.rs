@@ -4,7 +4,9 @@ use infra::uuid::Uuid;
 use sea_orm::{entity::prelude::*, FromQueryResult, Set};
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize)]
+use super::{attribute, attribute_option};
+
+#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Serialize, Deserialize, Copy)]
 #[sea_orm(table_name = "product")]
 #[serde(rename_all = "camelCase")]
 pub struct Model {
@@ -13,6 +15,7 @@ pub struct Model {
   pub product_template_id: Uuid,
   pub price: Decimal,
   pub cost: Decimal,
+  pub is_product_variant: bool,
   pub created_at: ChronoDateTimeWithTimeZone,
   #[sea_orm(nullable)]
   pub updated_at: Option<ChronoDateTimeWithTimeZone>,
@@ -31,6 +34,16 @@ pub enum Relation {
 impl Related<super::product_template::Entity> for Entity {
   fn to() -> RelationDef {
     Relation::ProductTemplate.def()
+  }
+}
+
+impl Related<super::attribute_option::Entity> for Entity {
+  fn to() -> RelationDef {
+    super::product_combination::Relation::AttributeOption.def()
+  }
+
+  fn via() -> Option<RelationDef> {
+    Some(super::product_combination::Relation::Product.def().rev())
   }
 }
 
@@ -56,10 +69,29 @@ impl ActiveModelBehavior for ActiveModel {
   }
 }
 
-#[derive(Debug, Serialize, FromQueryResult)]
-#[serde(rename_all = "camelCase")]
+#[derive(Debug, FromQueryResult)]
 pub struct QueryProductResult {
   pub id: Uuid,
   pub name: String,
-  pub product_template_id: Uuid,
+  pub is_product_variant: bool,
+  pub product_template_id: Option<Uuid>,
+  pub attribute_id: Option<Uuid>,
+  pub attribute_name: Option<String>,
+  pub attribute_option_id: Option<Uuid>,
+  pub attribute_option_value: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ProductDTO {
+  pub id: Uuid,
+  pub name: String,
+  pub is_product_variant: bool,
+  pub combinations: Vec<AttributeWithOptionDTO>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct AttributeWithOptionDTO {
+  pub attribute: attribute::PartialModel,
+  pub option: attribute_option::PartialModel,
 }

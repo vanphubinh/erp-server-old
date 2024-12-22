@@ -53,7 +53,7 @@ impl ActiveModelBehavior for ActiveModel {
   }
 }
 
-#[derive(Debug, DerivePartialModel, Serialize, FromQueryResult)]
+#[derive(Debug, DerivePartialModel, Clone, Deserialize, Serialize, FromQueryResult)]
 #[sea_orm(entity = "Entity")]
 #[serde(rename_all = "camelCase")]
 pub struct PartialModel {

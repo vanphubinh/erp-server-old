@@ -6,7 +6,7 @@ use axum::{
   Json,
 };
 use axum_macros::debug_handler;
-use domain::product::product::QueryProductResult;
+use domain::product::product::ProductDTO;
 use infra::{
   response::{CreateResponse, PaginatedResponse},
   state::AppState,
@@ -22,7 +22,7 @@ use service::product::{
 pub async fn list_paginated_products(
   State(state): State<Arc<AppState>>,
   Query(query): Query<ListPaginatedProductsParams>,
-) -> Result<PaginatedResponse<QueryProductResult>, ListPaginatedProductsError> {
+) -> Result<PaginatedResponse<ProductDTO>, ListPaginatedProductsError> {
   let usecase = ListPaginatedProductsUsecase {
     page: Some(query.page.unwrap_or(1)),
     per_page: Some(query.per_page.unwrap_or(30)),
@@ -30,7 +30,7 @@ pub async fn list_paginated_products(
 
   let (products, meta) = usecase.invoke(state.read_db.clone()).await?;
 
-  Ok(PaginatedResponse::<QueryProductResult> {
+  Ok(PaginatedResponse::<ProductDTO> {
     ok: true,
     data: products,
     meta,
@@ -53,15 +53,26 @@ pub async fn create_product(
     category_id: payload.category_id,
     create_corresponding_moulds: payload.create_corresponding_moulds,
     is_multiple_variants: payload.is_multiple_variants,
+    variants: payload.variants,
   };
 
-  let product = usecase.invoke(state.write_db.clone()).await?;
+  let products = usecase.invoke(state.write_db.clone()).await?;
 
-  Ok((
-    StatusCode::CREATED,
-    CreateResponse {
-      id: product.id,
-      ok: true,
-    },
-  ))
+  if products.len() == 1 {
+    Ok((
+      StatusCode::CREATED,
+      CreateResponse {
+        id: products[0].id,
+        ok: true,
+      },
+    ))
+  } else {
+    Ok((
+      StatusCode::CREATED,
+      CreateResponse {
+        id: products[0].product_template_id,
+        ok: true,
+      },
+    ))
+  }
 }
